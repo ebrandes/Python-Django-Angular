@@ -28,13 +28,17 @@ class CardSerializer(serializers.ModelSerializer):
         return card
 
     def update(self, instance, validated_data):
-        """Encrypt CVV if provided during an update."""
-        cvv = validated_data.pop('cvv', None)
-        instance = super().update(instance, validated_data)
-
-        if cvv:
-            instance.set_cvv(cvv)  # Encrypt new CVV
-            instance.save()
+        allowed_fields = {'active', 'selected'}  # Define fields that can be updated
+        filtered_data = {key: value for key, value in validated_data.items() if key in allowed_fields}
         
-        return instance
+        card = Card.objects.get(id=instance.id)
+        card.selected = validated_data.get('selected')
+        return super().update(instance, filtered_data)
+    
+    def patch(self, instance, validated_data):
+        allowed_fields = {'active', 'selected'}  # Define fields that can be updated
+        filtered_data = {key: value for key, value in validated_data.items() if key in allowed_fields}
+        
+        return super().update(instance, filtered_data)
+
         

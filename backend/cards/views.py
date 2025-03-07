@@ -1,7 +1,7 @@
+from functools import partial
 from cards.models import Card
 from cards.serialize import CardSerializer
 from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -17,8 +17,7 @@ from helpers.swagger import get_auth_header
     responses={201: CardSerializer(), 400: "Invalid input"}
 )
 @api_view(['POST'])
-@permission_classes([AllowAny])
-def create_card(request) :
+def card_create(request) :
     """Handles POST (create card)"""
     if request.method == 'POST':
         serializer = CardSerializer(data=request.data)
@@ -26,6 +25,40 @@ def create_card(request) :
             card = serializer.save()
             return Response(CardSerializer(card).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@swagger_auto_schema(
+    method='PATCH',
+    operation_summary="Update Card",
+    operation_description="Update a card with the provided data.",
+    manual_parameters=[get_auth_header()],
+    request_body=CardSerializer,
+    responses={200: CardSerializer(), 400: "Invalid input"}
+)
+@api_view(['PATCH'])
+def card_update(request):
+    """Handles PATCH (update card)"""
+    card_id = request.data.get("id")  # Extract ID from the request body
+
+    if not card_id:
+        return Response({"error": "Card ID is required in the request body"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        cards = Card.objects.filter(user=request.user)
+        for card in cards:
+            card.selected = False
+            card.save()
+            
+        card = cards.get(id=card_id)  # Retrieve the card instance
+    except Card.DoesNotExist:
+        return Response({"error": "Card not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = CardSerializer(card, data=request.data, partial=True)  # Allow partial updates
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @swagger_auto_schema(
     method='get',
@@ -43,3 +76,4 @@ def card_list(request):
         cards = cards.filter(active=True)
         serializer = CardSerializer(cards, many=True)
         return Response(serializer.data)
+    
