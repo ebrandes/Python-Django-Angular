@@ -1,0 +1,40 @@
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment (venv)
+venv/
+env/
+
+# Ignore secret files
+*.env
+*.DS_Store
+*.log
+*.sqlite3
+
+# Ignore database migrations (optional)
+**/migrations/**  # Ignore migration files except __init__.py
+!**/migrations/__init__.py
+
+# Ignore compiled code
+*.pyc
+*.pyo
+
+# Ignore editor files
+.vscode/
+.idea/
+*.swp
+
+# Ignore media and static files (optional if using external storage)
+media/
+staticfiles/
+
+# Ignore Python dependencies (Pipenv, Poetry, etc.)
+Pipfile
+Pipfile.lock
+poetry.lock
+
+# Ignore Docker and deployment files (if applicable)
+docker-compose.override.yml
+*.dockerfile
