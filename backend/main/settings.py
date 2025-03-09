@@ -17,7 +17,7 @@ from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DATABASES = {
+DATABASES = {  # type: ignore
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "django",
@@ -84,7 +84,7 @@ if not CREDIT_CARD_SECRET_KEY:
     raise ValueError("Missing encryption key for credit card security.")
 
 
-SIMPLE_JWT = {
+SIMPLE_JWT = {  # type: ignore
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),  # Token expires in 1 day
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  # Refresh token expires in 7 days
     "AUTH_HEADER_TYPES": ("Bearer",),
@@ -104,7 +104,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "main.urls"
 
-TEMPLATES = [
+TEMPLATES = [  # type: ignore
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [os.path.join(BASE_DIR, "templates")],

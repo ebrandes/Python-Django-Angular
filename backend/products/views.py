@@ -1,4 +1,5 @@
 from rest_framework.decorators import api_view
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg import openapi
@@ -30,8 +31,16 @@ def product_list(_):
     request_body=ProductSerializer,
     responses={201: ProductSerializer(), 400: "Invalid input"},
 )
-@api_view(["POST"])
-def product_create(request):
+def product_create(request: Request) -> Response:
+    """Create a new product"""
+    serializer = ProductSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def product_create(request: Request) -> Response:
     """Create a new product"""
     serializer = ProductSerializer(data=request.data)
     if serializer.is_valid():
