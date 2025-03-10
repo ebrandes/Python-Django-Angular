@@ -1,8 +1,9 @@
 from django.db import models
 from users.models import User  # Import User model from users app
 
+
 class Address(models.Model):
-    id = models.AutoField(primary_key=True)  
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
@@ -13,13 +14,9 @@ class Address(models.Model):
     selected = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
-    
+
     class Meta:
-        db_table = 'addresses'
+        db_table = "addresses"
 
     def __str__(self):
         return f"{self.street}, {self.city}, {self.country}"
-
-
-

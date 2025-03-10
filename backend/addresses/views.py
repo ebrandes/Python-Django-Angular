@@ -79,21 +79,32 @@ def patch_address(request):
     """
     user = request.user
 
-    if not user:
+    if not user or not user.is_authenticated:
         return Response(
             {"message": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED
         )
 
-    addresses = Address.objects.filter(user=user)
-    for address in addresses:
-        address.selected = False
-        address.save()
-
+    # Obtém o ID do endereço a ser atualizado
     address_id = request.data.get("id")
-    address = Address.objects.get(id=address_id)
-    address.selected = True
-    address.save()
+    if not address_id:
+        return Response(
+            {"message": "Address ID is required"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
-    return Response(
-        {"message": "Address selected as default"}, status=status.HTTP_200_OK
-    )
+    # Busca o endereço do usuário
+    try:
+        address = Address.objects.get(id=address_id, user=user)
+    except Address.DoesNotExist:
+        return Response(
+            {"message": "Address not found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Atualiza apenas os campos enviados no request
+    serializer = AddressSerializer(
+        address, data=request.data, partial=True
+    )  # ✅ Atualiza sem criar um novo objeto
+    if serializer.is_valid():
+        serializer.save()  # ✅ Apenas os campos enviados são alterados
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

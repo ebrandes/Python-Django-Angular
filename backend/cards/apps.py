@@ -2,5 +2,10 @@ from django.apps import AppConfig
 
 
 class CardsConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'cards'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "cards"
+
+    def ready(self) -> None:
+        import cards.signals
+
+        return super().ready()
