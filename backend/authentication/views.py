@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 
+
 @swagger_auto_schema(
     method="POST",
     operation_summary="Login User",
@@ -32,7 +33,10 @@ def login_user(request):
     password = request.data.get("password")
 
     if not email or not password:
-        return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"message": "Email and password are required"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     user = authenticate(username=email, password=password)  # ✅ Django authentication
 
@@ -51,4 +55,6 @@ def login_user(request):
             status=status.HTTP_200_OK,
         )
 
-    return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response(
+        {"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
+    )

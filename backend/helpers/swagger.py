@@ -1,5 +1,6 @@
 from drf_yasg import openapi
 
+
 def get_auth_header():
     """
     Returns the standard Authorization header for Swagger documentation.
@@ -9,5 +10,5 @@ def get_auth_header():
         openapi.IN_HEADER,
         description="Token format: Bearer <token>",
         type=openapi.TYPE_STRING,
-        required=True
+        required=True,
     )
