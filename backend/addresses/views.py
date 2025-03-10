@@ -18,21 +18,27 @@ from drf_yasg import openapi
     responses={201: "Address created successfully", 401: "User not authenticated"},
 )
 @api_view(["POST"])
-@permission_classes([IsAuthenticated]) 
+@permission_classes([IsAuthenticated])
 def create_address(request):
     """
     Create a new address for the authenticated user.
     """
-    user = request.user  
+    user = request.user
 
     if not user:
-        return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(
+            {"message": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED
+        )
 
     address = AddressSerializer(data=request.data)
     if address.is_valid():
         address = address.save(user=user)
 
-    return Response({"message": "Address created successfully", "address_id": address.id}, status=status.HTTP_201_CREATED)
+    return Response(
+        {"message": "Address created successfully", "address_id": address.id},
+        status=status.HTTP_201_CREATED,
+    )
+
 
 @swagger_auto_schema(
     method="GET",
@@ -49,11 +55,14 @@ def get_addresses(request):
     user = request.user
 
     if not user:
-        return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(
+            {"message": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED
+        )
 
     addresses = Address.objects.filter(user=user)
     serializer = AddressSerializer(addresses, many=True)
     return Response(serializer.data)
+
 
 @swagger_auto_schema(
     method="PATCH",
@@ -61,7 +70,7 @@ def get_addresses(request):
     operation_description="Select an address as default for the authenticated user.",
     manual_parameters=[get_auth_header()],
     request_body=AddressSerializer,
-    responses={200: "Address selected as default", 401: "User not authenticated"}
+    responses={200: "Address selected as default", 401: "User not authenticated"},
 )
 @api_view(["PATCH"])
 def patch_address(request):
@@ -71,7 +80,9 @@ def patch_address(request):
     user = request.user
 
     if not user:
-        return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(
+            {"message": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED
+        )
 
     addresses = Address.objects.filter(user=user)
     for address in addresses:
@@ -83,4 +94,6 @@ def patch_address(request):
     address.selected = True
     address.save()
 
-    return Response({"message": "Address selected as default"}, status=status.HTTP_200_OK)
+    return Response(
+        {"message": "Address selected as default"}, status=status.HTTP_200_OK
+    )
