@@ -24,7 +24,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
     responses={200: "User logged in", 401: "Invalid credentials"},
 )
 @api_view(["POST"])
-@permission_classes([AllowAny])  # Allow access without authentication
+@permission_classes([AllowAny])
 def login_user(request):
     """
     Authenticate a user and return a JWT token.
@@ -38,10 +38,10 @@ def login_user(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    user = authenticate(username=email, password=password)  # ✅ Django authentication
+    user = authenticate(username=email, password=password)
 
     if user is not None:
-        refresh = RefreshToken.for_user(user)  # ✅ Generates JWT tokens
+        refresh = RefreshToken.for_user(user)
         return Response(
             {
                 "user_id": str(user.id),

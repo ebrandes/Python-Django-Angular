@@ -20,7 +20,6 @@ class CartView(APIView):
         """Retorna o carrinho do usuário autenticado"""
         cart, created = Cart.objects.get_or_create(user=request.user)
 
-        # ✅ Se o carrinho for criado agora, preenche address e payment_card automaticamente
         if created:
             cart.address = Address.objects.filter(user=request.user).first()
             cart.payment_card = Card.objects.filter(user=request.user).first()
@@ -36,7 +35,6 @@ class CartView(APIView):
         address = Address.objects.filter(user=request.user).first()
         payment_card = Card.objects.filter(user=request.user).first()
 
-        # ✅ Atualiza o carrinho apenas se um novo endereço ou cartão for encontrado
         if address:
             cart.address = address
         if payment_card:
@@ -55,7 +53,6 @@ class AddToCartView(APIView):
         """Adiciona produto ao carrinho e preenche endereço/cartão se necessário"""
         cart, created = Cart.objects.get_or_create(user=request.user)
 
-        # ✅ Se o carrinho acabou de ser criado, preenche address e payment_card automaticamente
         if created:
             cart.address = Address.objects.filter(user=request.user).first()
             cart.payment_card = Card.objects.filter(user=request.user).first()
@@ -95,7 +92,7 @@ class CheckoutView(APIView):
                 {"message": "Carrinho não encontrado"}, status=status.HTTP_404_NOT_FOUND
             )
 
-        if not cart.items.exists():  # type: ignore
+        if not cart.items.exists():
             return Response(
                 {"message": "O carrinho está vazio"}, status=status.HTTP_400_BAD_REQUEST
             )
@@ -106,8 +103,7 @@ class CheckoutView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Deduzir estoque dos produtos
-        for cart_item in cart.items.all():  # type: ignore
+        for cart_item in cart.items.all():
             if cart_item.product.stock < cart_item.quantity:
                 return Response(
                     {"message": f"Estoque insuficiente para {cart_item.product.name}"},
@@ -116,8 +112,7 @@ class CheckoutView(APIView):
             cart_item.product.stock -= cart_item.quantity
             cart_item.product.save()
 
-        # Limpa o carrinho
-        cart.items.all().delete()  # type: ignore
+        cart.items.all().delete()
 
         return Response(
             {"message": "Compra realizada com sucesso!"}, status=status.HTTP_200_OK

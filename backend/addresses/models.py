@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import User  # Import User model from users app
+from users.models import User
 
 
 class Address(models.Model):
