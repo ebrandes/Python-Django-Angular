@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django.http import JsonResponse
 from users.models import User
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -42,19 +43,48 @@ def login_user(request):
 
     if user is not None:
         refresh = RefreshToken.for_user(user)
-        return Response(
+
+        response = JsonResponse(
             {
                 "user_id": str(user.id),
                 "first_name": user.first_name,
                 "last_name": user.last_name,
                 "email": user.email,
                 "role": user.role,
-                "access_token": str(refresh.access_token),
-                "refresh_token": str(refresh),
-            },
-            status=status.HTTP_200_OK,
+            }
         )
+
+        response.set_cookie(
+            key="access_token",
+            value=str(refresh.access_token),
+            httponly=True,
+            secure=True,
+            samesite="None",
+        )
+
+        response.set_cookie(
+            key="refresh_token",
+            value=str(refresh),
+            httponly=True,
+            samesite="Strict",
+            secure=True,
+        )
+
+        return response
 
     return Response(
         {"message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
     )
+
+
+@api_view(["POST"])
+def logout_user(request):
+    response = JsonResponse({"message": "Logged out successfully"})
+    response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
+
+    # Ensure cookies are removed even if HttpOnly is set
+    response.set_cookie("access_token", "", max_age=0)
+    response.set_cookie("refresh_token", "", max_age=0)
+
+    return response

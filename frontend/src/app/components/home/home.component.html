@@ -1,0 +1,18 @@
+<div color="primary">
+  <span>My Angular + Django App</span>
+  <button mat-button (click)="logout()">Logout</button>
+</div>
+
+<div class="home-component">
+  <div *ngFor="let product of products" class="home-component__product-card">
+    <div>
+      <div>{{ product.name }}</div>
+    </div>
+    <div>
+      <p>Price: {{ product.price }}</p>
+    </div>
+    <div>
+      <button>Buy Now</button>
+    </div>
+  </div>
+</div>
