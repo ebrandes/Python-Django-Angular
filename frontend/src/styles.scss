@@ -1,1 +1,14 @@
-html {}
+@import "primeicons/primeicons.css";
+
+/* You can add global styles to this file, and also import other style files */
+:root,
+* {
+  font-family: "Work Sans", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+body,
+html {
+  height: 100%;
+}

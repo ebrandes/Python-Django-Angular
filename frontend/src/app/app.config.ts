@@ -1,18 +1,27 @@
-import { provideHttpClient, withFetch } from '@angular/common/http';
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
-
-import { provideAnimations } from '@angular/platform-browser/animations';
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+  provideClientHydration,
+  withEventReplay,
+} from '@angular/platform-browser';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
+import Lara from '@primeng/themes/lara';
+import { providePrimeNG } from 'primeng/config';
 import { routes } from './app.routes';
+import { provideHttpClient } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withComponentInputBinding()),
-    provideAnimations(),
-    provideHttpClient(
-      withFetch()
-      // withInterceptors([apiInterceptor, authInterceptor])
-    ),
-    importProvidersFrom(),
+    provideClientHydration(withEventReplay()),
+    provideAnimationsAsync(),
+    providePrimeNG({
+      ripple: true,
+      theme: {
+        preset: Lara,
+      },
+    }),
+    provideHttpClient(),
   ],
 };

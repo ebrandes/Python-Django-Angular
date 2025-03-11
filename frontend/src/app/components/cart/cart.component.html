@@ -1,0 +1,14 @@
+<div class="cart-component">
+  <p>cart works!</p>
+  <ul *ngIf="cart$ | async as cart">
+    <li *ngFor="let item of cart.items">
+      <div>
+        <p>
+          {{ item?.name }} - {{ item?.totalPrice }} -
+          {{ item?.quantity }}
+        </p>
+        <p-button (click)="removeFromCart(item)">remove</p-button>
+      </div>
+    </li>
+  </ul>
+</div>

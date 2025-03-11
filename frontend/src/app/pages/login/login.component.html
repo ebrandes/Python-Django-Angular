@@ -1,0 +1,90 @@
+<div class="login-page">
+  <div class="login-page__container">
+    <div class="login-page__container__header">
+      <h1 class="login-page__container__header__title">
+        <strong>W</strong>elcome
+      </h1>
+    </div>
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+      class="login-page__container__form"
+    >
+      <div>
+        <p-floatlabel
+          variant="on"
+          [ngClass]="{
+            'is-invalid':
+              loginForm.controls['email'].invalid &&
+              loginForm.controls['email'].touched
+          }"
+        >
+          <input
+            pInputText
+            id="email"
+            formControlName="email"
+            type="email"
+            autocomplete="email"
+          />
+          <label for="email">Email</label>
+        </p-floatlabel>
+
+        <p-message
+          *ngIf="
+            loginForm.controls['email'].invalid &&
+            loginForm.controls['email'].touched
+          "
+          severity="error"
+          variant="simple"
+          size="small"
+        >
+          <span *ngIf="loginForm.get('email')?.errors?.['required']"
+            >Email is required</span
+          >
+          <span *ngIf="loginForm.get('email')?.errors?.['email']"
+            >Invalid email format</span
+          >
+        </p-message>
+      </div>
+      <div>
+        <p-floatlabel
+          variant="on"
+          [ngClass]="{
+            'is-invalid':
+              loginForm.controls['email'].invalid &&
+              loginForm.controls['email'].touched
+          }"
+        >
+          <p-password
+            [toggleMask]="true"
+            id="password"
+            formControlName="password"
+            [feedback]="false"
+            autocomplete="password"
+          />
+          <label for="password">Password</label>
+        </p-floatlabel>
+        <p-message
+          *ngIf="
+            loginForm.controls['password'].invalid &&
+            loginForm.controls['password'].touched
+          "
+          severity="error"
+          variant="simple"
+          size="small"
+        >
+          <span *ngIf="loginForm.get('password')?.errors?.['required']"
+            >Password is required</span
+          >
+        </p-message>
+      </div>
+
+      <p-button
+        type="submit"
+        label="Login"
+        fluid="true"
+        class="login-page__container__form__submit"
+      />
+    </form>
+  </div>
+</div>

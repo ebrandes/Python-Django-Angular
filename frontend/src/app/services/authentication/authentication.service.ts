@@ -1,43 +1,89 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, switchMap, tap } from 'rxjs';
-import { User } from '../../@types/user';
 import { Router } from '@angular/router';
-import { environment } from '../../../environments/environment';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
+import { User } from '../../@types/user';
+import { StorageService } from '../session-storage/session-storage.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthenticationService {
-  http = inject(HttpClient);
+  private userSubject = new BehaviorSubject<User | null>(
+    this.getUserFromSession()
+  );
+
+  user$: Observable<User | null> = this.userSubject.asObservable();
+  sessionStorage = inject(StorageService);
   router = inject(Router);
 
-  login(email: string, password: string): Observable<User> {
-    return this.http.post<User>(`${environment.apiBaseUrl}/auth/login/`, {
-      email,
-      password,
-    });
-  }
+  constructor(private http: HttpClient) {}
 
-  logout(): Observable<void> {
+  getCurrentUser(): Observable<User | null> {
+    if (this.userSubject.value) {
+      return of(this.userSubject.value);
+    }
+
     return this.http
-      .post<void>(`${environment.apiBaseUrl}/auth/logout/`, {
+      .get<User>(`${environment.apiBaseUrl}/api/users/me/`, {
         withCredentials: true,
       })
       .pipe(
-        tap(() => {
-          console.log('Logged out successfully');
-          window.location.href = '/login';
+        tap((user) => {
+          this.setUserInSession(user);
+          this.userSubject.next(user);
+        }),
+        catchError(() => {
+          this.clearSession();
+          this.userSubject.next(null);
+          return of(null);
         })
       );
   }
 
-  private getRefreshToken(): string | null {
-    return (
-      document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('refresh_token='))
-        ?.split('=')[1] || null
-    );
+  login(email: string, password: string): Observable<User> {
+    return this.http
+      .post<User>(
+        `${environment.apiBaseUrl}/api/auth/login/`,
+        { email, password },
+        { withCredentials: true }
+      )
+      .pipe(
+        tap((user) => {
+          this.setUserInSession(user);
+          this.userSubject.next(user);
+        })
+      );
+  }
+
+  logout(): Observable<Object> {
+    return this.http
+      .post(
+        `${environment.apiBaseUrl}/api/auth/logout/`,
+        {},
+        { withCredentials: true }
+      )
+      .pipe(
+        tap(() => {
+          this.clearSession();
+          this.userSubject.next(null);
+          this.router.navigate(['/login']);
+        })
+      );
+  }
+
+  private setUserInSession(user: User) {
+    this.sessionStorage?.setItem('user', JSON.stringify(user));
+  }
+
+  private getUserFromSession(): User | null {
+    const userData = this.sessionStorage?.getItem<User>('user');
+    return userData ? userData : null;
+  }
+
+  private clearSession() {
+    this.sessionStorage?.removeItem('user');
   }
 }
