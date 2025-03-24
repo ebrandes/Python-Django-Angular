@@ -21,6 +21,23 @@ export class CartComponent implements OnInit {
     this.cartService.getCart().subscribe();
   }
 
+  checkout() {
+    this.cartService.checkout().subscribe({
+      next: () => {
+        this.toastService.showSuccess(
+          'Checkout successful',
+          'You have successfully checked out'
+        );
+      },
+      error: () => {
+        this.toastService.showError(
+          'Error',
+          'An error occurred while checking out'
+        );
+      },
+    });
+  }
+
   removeFromCart(item: Product) {
     this.cartService.removeFromCart(item.id).subscribe({
       next: () => {

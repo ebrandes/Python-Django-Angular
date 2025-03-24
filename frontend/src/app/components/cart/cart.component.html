@@ -1,14 +1,26 @@
 <div class="cart-component">
-  <p>cart works!</p>
-  <ul *ngIf="cart$ | async as cart">
-    <li *ngFor="let item of cart.items">
-      <div>
+  <p *ngIf="(cart$ | async)?.items?.length === 0">Cart is Empty</p>
+
+  <div *ngIf="cart$ | async as cart">
+    <ul class="cart-component__list">
+      <li
+        *ngFor="let item of cart.items; let i = index"
+        class="cart-component__list__item"
+      >
         <p>
-          {{ item?.name }} - {{ item?.totalPrice }} -
+          <strong> {{ i + 1 }} - </strong> {{ item?.name }} -
+          {{ item?.totalPrice | currency : "BRL" : "R$ " : "1.2-2" }} - qty:
           {{ item?.quantity }}
         </p>
-        <p-button (click)="removeFromCart(item)">remove</p-button>
-      </div>
-    </li>
-  </ul>
+        <p-button variant="text" (click)="removeFromCart(item)"
+          >remove</p-button
+        >
+      </li>
+    </ul>
+    <p-button
+      *ngIf="cart && cart.items && cart.items.length >= 1"
+      (click)="checkout()"
+      >Checkout</p-button
+    >
+  </div>
 </div>

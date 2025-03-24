@@ -1,3 +1,4 @@
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import {
   provideClientHydration,
@@ -8,7 +9,7 @@ import { provideRouter, withComponentInputBinding } from '@angular/router';
 import Lara from '@primeng/themes/lara';
 import { providePrimeNG } from 'primeng/config';
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
+import { authInterceptor } from './interceptors/auth/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,6 +23,6 @@ export const appConfig: ApplicationConfig = {
         preset: Lara,
       },
     }),
-    provideHttpClient(),
+    [provideHttpClient(withInterceptors([authInterceptor]))],
   ],
 };

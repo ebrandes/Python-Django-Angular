@@ -1,35 +1,23 @@
-import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
-import { AuthenticationService } from '../../services/authentication/authentication.service';
-import { ButtonModule } from 'primeng/button';
-import { ToastService } from '../../services/toast/toast.service';
-import { DrawerModule } from 'primeng/drawer';
-import { CartComponent } from '../../components/cart/cart.component';
 import { CommonModule } from '@angular/common';
-import { Product } from '../../@types/product';
-import { ProductsService } from '../../services/products/products.service';
+import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { Product } from '../../@types/product';
 import { CartService } from '../../services/cart/cart.service';
+import { ProductsService } from '../../services/products/products.service';
+import { ToastService } from '../../services/toast/toast.service';
 
 @Component({
   selector: 'app-home',
-  imports: [
-    CommonModule,
-    ButtonModule,
-    DrawerModule,
-    CardModule,
-    CartComponent,
-  ],
+  imports: [CommonModule, ButtonModule, CardModule],
   templateUrl: './home.component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrl: './home.component.scss',
 })
 export class HomeComponent implements OnInit {
-  authenticationService = inject(AuthenticationService);
   productService = inject(ProductsService);
   cartService = inject(CartService);
   toastService = inject(ToastService);
-
-  visible: boolean = false;
 
   products: Product[] = [];
 
@@ -45,15 +33,10 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  logout() {
-    this.authenticationService.logout().subscribe(() => {
-      this.toastService.showSuccess('Logged out', 'You are now logged out');
-    });
-  }
-
   addToCart(product: Product) {
     this.cartService.addToCart(product.id, 1).subscribe({
       next: () => {
+        //open cart
         this.toastService.showSuccess('Added to cart', 'Product added to cart');
       },
       error: () => {

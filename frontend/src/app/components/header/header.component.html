@@ -1,0 +1,50 @@
+<div class="header-component">
+  <div class="header-component__header">
+    <div class="header-component__header__content">
+      <h2>POC</h2>
+    </div>
+    <div class="header-component__header__content__actions">
+      <p-button
+        (click)="toggleCart()"
+        icon="pi pi-shopping-cart"
+        rounded="true"
+      ></p-button>
+      <p-button
+        [rounded]="true"
+        [outlined]="true"
+        (click)="op.toggle($event)"
+        icon="pi pi pi-users"
+      />
+      <p-popover #op>
+        <ul>
+          <li>
+            <div *ngIf="user$ | async as user">
+              <span>{{ user?.firstName }}</span>
+              <div>
+                {{ user?.email }}
+              </div>
+            </div>
+          </li>
+          <li (click)="logout()">
+            <p-button
+              variant="text"
+              icon="pi pi-sign-out"
+              label="Logout"
+            ></p-button>
+          </li>
+        </ul>
+      </p-popover>
+    </div>
+  </div>
+  <p-drawer
+    [visible]="(cartIsVisible$ | async) ?? false"
+    (onHide)="cartService.closeCart()"
+    header="My Cart"
+    position="right"
+    styleClass="cart-drawer"
+  >
+    <ng-container *ngIf="cartComponent">
+      <ng-container *ngComponentOutlet="cartComponent"></ng-container>
+    </ng-container>
+  </p-drawer>
+</div>

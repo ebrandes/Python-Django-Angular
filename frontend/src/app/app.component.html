@@ -1,2 +1,5 @@
-<p-toast></p-toast>
+<p-toast position="top-left"></p-toast>
+<ng-container *ngIf="showHeader()">
+  <app-header></app-header>
+</ng-container>
 <router-outlet />

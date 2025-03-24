@@ -2,10 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { User } from '../../@types/user';
 import { StorageService } from '../session-storage/session-storage.service';
+import { UserResponse } from './@types/user.response';
 
 @Injectable({
   providedIn: 'root',
@@ -27,14 +28,16 @@ export class AuthenticationService {
     }
 
     return this.http
-      .get<User>(`${environment.apiBaseUrl}/api/users/me/`, {
+      .get<UserResponse>(`${environment.apiBaseUrl}/api/users/me/`, {
         withCredentials: true,
       })
       .pipe(
-        tap((user) => {
+        tap((userResponse) => {
+          const user = this.userResponseToUser(userResponse);
           this.setUserInSession(user);
           this.userSubject.next(user);
         }),
+        map((userResponse) => this.userResponseToUser(userResponse)),
         catchError(() => {
           this.clearSession();
           this.userSubject.next(null);
@@ -51,9 +54,8 @@ export class AuthenticationService {
         { withCredentials: true }
       )
       .pipe(
-        tap((user) => {
-          this.setUserInSession(user);
-          this.userSubject.next(user);
+        tap((_) => {
+          this.getCurrentUser().subscribe();
         })
       );
   }
@@ -72,6 +74,26 @@ export class AuthenticationService {
           this.router.navigate(['/login']);
         })
       );
+  }
+
+  refreshToken(): Observable<User> {
+    return this.http.post<User>(
+      `${environment.apiBaseUrl}/api/auth/refresh/`,
+      {},
+      {
+        withCredentials: true,
+      }
+    );
+  }
+
+  private userResponseToUser(response: UserResponse): User {
+    return {
+      id: response.user_id,
+      email: response.email,
+      firstName: response.first_name,
+      lastName: response.last_name,
+      role: response.role,
+    };
   }
 
   private setUserInSession(user: User) {

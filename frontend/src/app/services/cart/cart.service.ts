@@ -20,17 +20,28 @@ export class CartService {
   private cartSubject = new BehaviorSubject<Cart | null>(null);
   cart$ = this.cartSubject.asObservable();
 
+  private cartIsVisibleSubject = new BehaviorSubject<boolean>(false);
+  cartIsVisible$ = this.cartIsVisibleSubject.asObservable();
+
   http = inject(HttpClient);
 
   getCart(): Observable<Cart> {
     return this.http
-      .get<CartResponse>(`${environment.apiBaseUrl}/api/cart`, {
+      .get<CartResponse>(`${environment.apiBaseUrl}/api/cart/`, {
         withCredentials: true,
       })
       .pipe(
         map((cartResponse) => this.cartResponseToCart(cartResponse)),
         tap((cart) => this.cartSubject.next(cart))
       );
+  }
+
+  checkout(): Observable<void> {
+    return this.http
+      .post<void>(`${environment.apiBaseUrl}/api/cart/checkout`, null, {
+        withCredentials: true,
+      })
+      .pipe(tap(() => this.getCart().subscribe()));
   }
 
   addToCart(productId: number, quantity: number): Observable<Cart> {
@@ -44,16 +55,31 @@ export class CartService {
       )
       .pipe(
         map((cartResponse) => this.cartResponseToCart(cartResponse)),
-        tap((cart) => this.cartSubject.next(cart))
+        tap((cart) => {
+          this.cartSubject.next(cart);
+          this.cartIsVisibleSubject.next(true);
+        })
       );
   }
 
   removeFromCart(productId: number): Observable<void> {
     return this.http
-      .delete<void>(`${environment.apiBaseUrl}/api/cart/${productId}`, {
+      .delete<void>(`${environment.apiBaseUrl}/api/cart/remove/${productId}/`, {
         withCredentials: true,
       })
       .pipe(tap(() => this.getCart().subscribe()));
+  }
+
+  openCart(): void {
+    this.cartIsVisibleSubject.next(true);
+  }
+
+  closeCart(): void {
+    this.cartIsVisibleSubject.next(false);
+  }
+
+  toggleCart(): void {
+    this.cartIsVisibleSubject.next(!this.cartIsVisibleSubject.value);
   }
 
   private cartResponseToCart(response: CartResponse): Cart {

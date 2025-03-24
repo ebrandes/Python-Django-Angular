@@ -1,59 +1,39 @@
 <div class="home-component">
-  <div class="home-component__header">
-    <div class="home-component__header__content">
-      <h2>POC</h2>
-      <p-button (click)="logout()">logout</p-button>
-    </div>
-    <p-button (click)="visible = !visible">
-      <i class="pi pi-shopping-cart"></i>
-    </p-button>
-  </div>
-  <p-drawer
-    [(visible)]="visible"
-    header="My Cart"
-    position="right"
-    styleClass="cart-drawer"
-  >
-    <app-cart />
-  </p-drawer>
+  <h2>Products</h2>
 
-  <div class="home-component__content">
-    <h2>Products</h2>
-
-    <div class="home-component__content__product-list">
-      <div
-        *ngFor="let product of products"
-        class="home-component__content__product-list__product"
-      >
-        <p-card class="product-card">
-          <ng-template #header>
-            <img
-              src="https://www.mockupworld.co/wp-content/uploads/dynamic/2021/10/free-product-boxes-mockup-psd-536x0-c-default.jpg"
-              alt="{`${product?.name}-mage`}"
-              width="100%"
-            />
-          </ng-template>
-          <ng-template #title> {{ product?.name }} </ng-template>
-          <ng-template #subtitle>
-            {{ product?.price | currency : "BRL" : "R$ " : "1.2-2" }}
-          </ng-template>
-          <p>
-            {{ product?.description }}
-          </p>
-          <ng-template #footer>
-            <div class="product-card__footer">
-              <p-button
-                class="w-full"
-                styleClass="w-full"
-                (onClick)="addToCart(product)"
-              >
-                <i class="pi pi-cart-plus"></i>
-                <strong>Buy</strong>
-              </p-button>
-            </div>
-          </ng-template>
-        </p-card>
-      </div>
+  <div class="home-component__content__product-list">
+    <div
+      *ngFor="let product of products"
+      class="home-component__content__product-list__product"
+    >
+      <p-card class="product-card">
+        <ng-template #header>
+          <img
+            src="https://www.mockupworld.co/wp-content/uploads/dynamic/2021/10/free-product-boxes-mockup-psd-536x0-c-default.jpg"
+            alt="{`${product?.name}-mage`}"
+            width="100%"
+          />
+        </ng-template>
+        <ng-template #title> {{ product?.name }} </ng-template>
+        <ng-template #subtitle>
+          {{ product?.price | currency : "BRL" : "R$ " : "1.2-2" }}
+        </ng-template>
+        <p>
+          {{ product?.description }}
+        </p>
+        <ng-template #footer>
+          <div class="product-card__footer">
+            <p-button
+              class="w-full"
+              styleClass="w-full"
+              (onClick)="addToCart(product)"
+            >
+              <i class="pi pi-cart-plus"></i>
+              <strong>Buy</strong>
+            </p-button>
+          </div>
+        </ng-template>
+      </p-card>
     </div>
   </div>
 </div>

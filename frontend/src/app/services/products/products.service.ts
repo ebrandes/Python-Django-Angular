@@ -13,7 +13,7 @@ export class ProductsService {
 
   getProducts(): Observable<Product[]> {
     return this.http
-      .get<ProductResponse[]>(`${environment.apiBaseUrl}/api/products`, {
+      .get<ProductResponse[]>(`${environment.apiBaseUrl}/api/products/`, {
         withCredentials: true,
       })
       .pipe(

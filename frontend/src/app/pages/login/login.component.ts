@@ -1,13 +1,13 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
-import { CommonModule } from '@angular/common';
-import { AuthenticationService } from '../../services/authentication/authentication.service';
-import { Router } from '@angular/router';
 import { PasswordModule } from 'primeng/password';
+import { AuthenticationService } from '../../services/authentication/authentication.service';
 import { ToastService } from '../../services/toast/toast.service';
 
 @Component({
